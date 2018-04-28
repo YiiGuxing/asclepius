@@ -6,6 +6,7 @@
 .idea/libraries/
 .idea/workspace.xml
 *.iml
+*.log
 log
 out
 gen
