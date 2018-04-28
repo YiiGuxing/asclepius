@@ -2,6 +2,7 @@
   <dictionary name="Yii.Guxing">
     <words>
       <w>guxing</w>
+      <w>interactor</w>
     </words>
   </dictionary>
 </component>
