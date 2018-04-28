@@ -1,0 +1,18 @@
+{
+  "group": "Soft Tissue CT",
+  "name": "Standard",
+  "advancedCLUT": false,
+  "clut": "VR Muscles-Bones",
+  "useShading": true,
+  "shading": "DEFAULT",
+  "windowLevel": 199.642593384,
+  "windowWidth": 243.732391357,
+  "backgroundColor": {
+    "blue": 0,
+    "green": 0,
+    "red": 0
+  },
+  "convolutionFilters": [],
+  "colors": [],
+  "curves": []
+}

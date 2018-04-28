@@ -1,0 +1,20 @@
+{
+  "group": "Soft Tissue CT",
+  "name": "Vascular",
+  "advancedCLUT": false,
+  "clut": "Stern",
+  "useShading": true,
+  "shading": "ENDOSCOPY",
+  "windowLevel": 362.950439453,
+  "windowWidth": 388.809204102,
+  "backgroundColor": {
+    "blue": 0,
+    "green": 0,
+    "red": 0
+  },
+  "convolutionFilters": [
+    "BASIC_SMOOTH_5X5"
+  ],
+  "colors": [],
+  "curves": []
+}

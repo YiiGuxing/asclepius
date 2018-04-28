@@ -1,0 +1,20 @@
+{
+  "group": "Bone CT",
+  "name": "Glossy II",
+  "advancedCLUT": false,
+  "clut": "VR Bones",
+  "useShading": true,
+  "shading": "ENDOSCOPY",
+  "windowLevel": 145.89743042,
+  "windowWidth": 137.935073853,
+  "backgroundColor": {
+    "blue": 0,
+    "green": 0,
+    "red": 0
+  },
+  "convolutionFilters": [
+    "BASIC_SMOOTH_5X5"
+  ],
+  "colors": [],
+  "curves": []
+}

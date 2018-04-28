@@ -1,0 +1,18 @@
+{
+  "group": "Soft Tissue CT",
+  "name": "Red on White",
+  "advancedCLUT": false,
+  "clut": "VR Red Vessels",
+  "useShading": true,
+  "shading": "DEFAULT",
+  "windowLevel": 372.838287354,
+  "windowWidth": 449.342712402,
+  "backgroundColor": {
+    "blue": 1,
+    "green": 1,
+    "red": 1
+  },
+  "convolutionFilters": [],
+  "colors": [],
+  "curves": []
+}

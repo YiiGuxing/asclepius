@@ -1,0 +1,17 @@
+{
+  "group": "Bone CT",
+  "name": "Pencil",
+  "advancedCLUT": false,
+  "useShading": true,
+  "shading": "GLOSSY_BONE",
+  "windowLevel": 381.529541016,
+  "windowWidth": 640.471557617,
+  "backgroundColor": {
+    "blue": 1,
+    "green": 1,
+    "red": 1
+  },
+  "convolutionFilters": [],
+  "colors": [],
+  "curves": []
+}

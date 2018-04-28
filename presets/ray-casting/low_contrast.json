@@ -1,0 +1,18 @@
+{
+  "group": "Basic",
+  "name": "Low Contrast",
+  "advancedCLUT": false,
+  "clut": "VR Muscles-Bones",
+  "useShading": true,
+  "shading": "DEFAULT",
+  "windowLevel": 304.167053223,
+  "windowWidth": 269.917907715,
+  "backgroundColor": {
+    "blue": 0,
+    "green": 0,
+    "red": 0
+  },
+  "convolutionFilters": [],
+  "colors": [],
+  "curves": []
+}

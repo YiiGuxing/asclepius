@@ -1,0 +1,20 @@
+{
+  "group": "Soft Tissue CT",
+  "name": "Vascular II",
+  "advancedCLUT": false,
+  "clut": "VR Red Vessels",
+  "useShading": true,
+  "shading": "ENDOSCOPY",
+  "windowLevel": 262.360076904,
+  "windowWidth": 189.627975464,
+  "backgroundColor": {
+    "blue": 0,
+    "green": 0,
+    "red": 0
+  },
+  "convolutionFilters": [
+    "BASIC_SMOOTH_5X5"
+  ],
+  "colors": [],
+  "curves": []
+}

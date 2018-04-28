@@ -1,0 +1,19 @@
+{
+  "group": "Bone CT",
+  "name": "Black & White",
+  "advancedCLUT": false,
+  "useShading": true,
+  "shading": "DEFAULT",
+  "windowLevel": 166.271240234,
+  "windowWidth": 176.725631714,
+  "backgroundColor": {
+    "blue": 1,
+    "green": 1,
+    "red": 1
+  },
+  "convolutionFilters": [
+    "BASIC_SMOOTH_5X5"
+  ],
+  "colors": [],
+  "curves": []
+}
