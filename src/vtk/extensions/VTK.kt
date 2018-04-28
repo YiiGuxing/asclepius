@@ -9,6 +9,7 @@ package vtk.extensions
 
 import vtk.vtkNativeLibrary
 import vtk.vtkObjectBase
+import java.io.File
 
 object VTK {
 
@@ -20,6 +21,10 @@ object VTK {
                 }
             }
         }
+    }
+
+    fun disableOutputWindow(logFile: File) {
+        vtkNativeLibrary.DisableOutputWindow(logFile)
     }
 
     fun gc() {

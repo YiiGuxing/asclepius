@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="cn.yiiguxing.asclepius.MainFrame">
+  <grid id="27dc6" binding="root" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="20" y="20" width="881" height="786"/>
+    </constraints>
+    <properties>
+      <background color="-12894656"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <grid id="8dda" binding="axial" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <background color="-14342875"/>
+        </properties>
+        <border type="line" title="Axial">
+          <title-color color="-1"/>
+          <color color="-16711936"/>
+        </border>
+        <children>
+          <component id="b9a7c" class="javax.swing.JScrollBar" binding="axialScrollBar">
+            <constraints border-constraint="East"/>
+            <properties>
+              <opaque value="false"/>
+              <value value="50"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="75076" binding="coronal" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <background color="-14342875"/>
+        </properties>
+        <border type="line" title="Coronal">
+          <title-color color="-1"/>
+          <color color="-65536"/>
+        </border>
+        <children>
+          <component id="f2193" class="javax.swing.JScrollBar" binding="coronalScrollBar">
+            <constraints border-constraint="East"/>
+            <properties>
+              <value value="50"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="94934" binding="sagittal" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <background color="-14342875"/>
+        </properties>
+        <border type="line" title="Sagittal">
+          <title-color color="-1"/>
+          <color color="-16776961"/>
+        </border>
+        <children>
+          <component id="f67e0" class="javax.swing.JScrollBar" binding="sagittalScrollBar">
+            <constraints border-constraint="East"/>
+            <properties>
+              <value value="50"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="434cb" binding="volume" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <background color="-14342875"/>
+        </properties>
+        <border type="line" title="Volume">
+          <title-color color="-1"/>
+          <color color="-256"/>
+        </border>
+        <children/>
+      </grid>
+    </children>
+  </grid>
+</form>
