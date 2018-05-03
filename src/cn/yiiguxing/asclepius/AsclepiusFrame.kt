@@ -126,6 +126,7 @@ class AsclepiusFrame(dcmDir: File) : MainFrame() {
         }
 
         fun setPreset(preset: RayCastingPreset) {
+            viewer.component.background = preset.backgroundColor.toAWTColor()
             val (r, g, b) = preset.backgroundColor
             viewer.renderer.SetBackground(r, g, b)
 
