@@ -63,6 +63,12 @@ class VolumeViewer : vtkJoglCanvasComponent() {
             PointSmoothingOn()
             LineSmoothingOn()
         }
+        camera.apply {
+            SetFocalPoint(0.0, 0.0, 0.0)
+            SetPosition(0.0, 1.0, 0.0)
+            SetViewUp(0.0, 0.0, -1.0)
+        }
+
         setupPopupMenu()
 
         component.addGLEventListener(object : GLEventListener {
