@@ -2,7 +2,7 @@
   <configuration default="false" name="Asclepius" type="JetRunConfigurationType" factoryName="Kotlin">
     <module name="asclepius" />
     <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="" />
+    <option name="PROGRAM_PARAMETERS" value="D:\Home\Data\dcm\zzl\0001123932\9" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="ALTERNATIVE_JRE_PATH" value="C:\Program Files\Java\jdk1.8.0_162\jre" />
     <option name="PASS_PARENT_ENVS" value="true" />

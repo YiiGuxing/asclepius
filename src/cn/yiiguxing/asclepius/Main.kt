@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
     Presets.loadPresets()
 
     // TODO 指定DICOM序列目录（目录内所有DICOM文件必须属于同一序列），由于使用的是vtkDICOMImageReader，所以一些DICOM文件无法读取
-    val dcmDir = File("D:\\Home\\Data\\dcm\\zzl\\0021608414\\7")
+    val dcmDir = File(args[0])
     AsclepiusFrame(dcmDir).apply {
         setSize(1280, 1080)
         setLocationRelativeTo(null)
