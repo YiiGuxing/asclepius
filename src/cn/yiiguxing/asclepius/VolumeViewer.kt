@@ -290,13 +290,18 @@ class VolumeViewer : vtkJoglCanvasComponent() {
             SetInputConnection(contourFilter.GetOutputPort())
             SetFeatureAngle(60.0)
         }
+        val stripper = vtkStripper().apply { SetInputConnection(normals.GetOutputPort()) }
         val mapper = vtkPolyDataMapper().apply {
-            SetInputConnection(normals.GetOutputPort())
+            SetInputConnection(stripper.GetOutputPort())
             ScalarVisibilityOff()
         }
         val actor = vtkActor().apply {
             SetMapper(mapper)
-            GetProperty().SetColor(color.red, color.green, color.blue)
+            GetProperty().apply {
+                SetDiffuseColor(color.red, color.green, color.blue)
+                SetSpecular(.1)
+                SetSpecularPower(30.0)
+            }
         }
         renderer.AddActor(actor)
         surfaceActors += actor
