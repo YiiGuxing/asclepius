@@ -3,15 +3,14 @@ package cn.yiiguxing.asclepius
 import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLEventListener
 import com.sun.java.swing.plaf.windows.WindowsMenuItemUI
+import com.sun.java.swing.plaf.windows.WindowsMenuUI
 import com.sun.java.swing.plaf.windows.WindowsRadioButtonMenuItemUI
 import vtk.*
 import vtk.extensions.VTK
 import vtk.rendering.jogl.vtkJoglCanvasComponent
 import vtk.rendering.vtkAbstractEventInterceptor
 import java.awt.event.MouseEvent
-import javax.swing.JMenuItem
-import javax.swing.JPopupMenu
-import javax.swing.JRadioButtonMenuItem
+import javax.swing.*
 import javax.swing.event.PopupMenuEvent
 import javax.swing.event.PopupMenuListener
 import kotlin.math.abs
@@ -51,7 +50,6 @@ class VolumeViewer : vtkJoglCanvasComponent() {
 
     private var isDisplay = false
     private var isFirst = true
-    private var lastSelectedItem: JRadioButtonMenuItem? = null
 
     init {
         setBackgroundColor(Color.BLACK)
@@ -94,28 +92,26 @@ class VolumeViewer : vtkJoglCanvasComponent() {
         })
         popupMenu.addSeparator()
 
-        popupMenu.add(JRadioButtonMenuItem("OFF", true).apply {
-            lastSelectedItem = this
-            setUI(WindowsRadioButtonMenuItemUI())
+        val group = ButtonGroup()
+        val presetsMenu = JMenu("Raycasting Presets").apply {
+            setUI(WindowsMenuUI())
 
-            fun updateAction() {
-                currentPreset = null
-            }
-
-            addActionListener { doAction(::updateAction) }
-        })
-        Presets.rayCastingPresets.forEach { preset ->
-            popupMenu.add(JRadioButtonMenuItem(preset.name).apply {
+            add(JRadioButtonMenuItem("OFF", true).apply {
+                group.add(this)
                 setUI(WindowsRadioButtonMenuItemUI())
-
-                fun updateAction() {
-                    currentPreset = preset
-                }
-
-                addActionListener { doAction(::updateAction) }
+                addActionListener { currentPreset = null }
             })
+
+            Presets.rayCastingPresets.forEach { preset ->
+                add(JRadioButtonMenuItem(preset.name).apply {
+                    group.add(this)
+                    setUI(WindowsRadioButtonMenuItemUI())
+                    addActionListener { currentPreset = preset }
+                })
+            }
         }
 
+        popupMenu.add(presetsMenu)
         popupMenu.addPopupMenuListener(object : PopupMenuListener {
             override fun popupMenuWillBecomeInvisible(e: PopupMenuEvent) = Unit
             override fun popupMenuCanceled(e: PopupMenuEvent) = Unit
@@ -139,14 +135,6 @@ class VolumeViewer : vtkJoglCanvasComponent() {
         }
     }
 
-    private fun JRadioButtonMenuItem.doAction(action: () -> Unit) {
-        if (this != lastSelectedItem) {
-            lastSelectedItem?.isSelected = false
-            lastSelectedItem = this
-            action()
-        }
-    }
-
     var imageData: vtkImageData? = null
         set(value) {
             if (value != field) {
@@ -165,6 +153,7 @@ class VolumeViewer : vtkJoglCanvasComponent() {
             }
         }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     var currentPreset: RayCastingPreset? = null
         set(value) {
             if (value != field) {
