@@ -8,8 +8,10 @@ import com.sun.java.swing.plaf.windows.WindowsRadioButtonMenuItemUI
 import vtk.*
 import vtk.extensions.VTK
 import vtk.rendering.jogl.vtkJoglCanvasComponent
-import vtk.rendering.vtkAbstractEventInterceptor
+import vtk.rendering.vtkEventInterceptor
+import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
+import java.awt.event.MouseWheelEvent
 import javax.swing.*
 import javax.swing.event.PopupMenuEvent
 import javax.swing.event.PopupMenuListener
@@ -51,6 +53,8 @@ class VolumeViewer : vtkJoglCanvasComponent() {
     private var isDisplay = false
     private var isFirst = true
 
+    private val popupMenu = createPopupMenu()
+
     init {
         setBackgroundColor(Color.BLACK)
         renderer.apply {
@@ -67,8 +71,7 @@ class VolumeViewer : vtkJoglCanvasComponent() {
             SetViewUp(0.0, 0.0, -1.0)
         }
 
-        setupPopupMenu()
-
+        interactorForwarder.eventInterceptor = EventInterceptor()
         component.addGLEventListener(object : GLEventListener {
             override fun display(glDrawable: GLAutoDrawable) {
                 isDisplay = true
@@ -80,7 +83,7 @@ class VolumeViewer : vtkJoglCanvasComponent() {
         })
     }
 
-    private fun setupPopupMenu() {
+    private fun createPopupMenu(): JPopupMenu {
         val popupMenu = JPopupMenu()
         popupMenu.add(JMenuItem("Add Surface").apply {
             setUI(WindowsMenuItemUI())
@@ -123,16 +126,7 @@ class VolumeViewer : vtkJoglCanvasComponent() {
             }
         })
 
-        interactorForwarder.eventInterceptor = object : vtkAbstractEventInterceptor() {
-            override fun mouseClicked(e: MouseEvent): Boolean {
-                if (e.button == MouseEvent.BUTTON3) {
-                    popupMenu.show(e.component, e.x, e.y)
-                    return true
-                }
-
-                return super.mouseClicked(e)
-            }
-        }
+        return popupMenu
     }
 
     var imageData: vtkImageData? = null
@@ -323,6 +317,34 @@ class VolumeViewer : vtkJoglCanvasComponent() {
             resetCamera()
         }
         Render()
+    }
+
+    private inner class EventInterceptor : vtkEventInterceptor {
+
+        private val interceptEvent
+            get() = with(this@VolumeViewer) {
+                imageData == null || (currentPreset == null && surfaceActors.isEmpty())
+            }
+
+        override fun mouseClicked(e: MouseEvent): Boolean {
+            return if (e.button == MouseEvent.BUTTON3) {
+                popupMenu.show(e.component, e.x, e.y)
+                true
+            } else {
+                interceptEvent
+            }
+        }
+
+        override fun mouseMoved(e: MouseEvent) = interceptEvent
+        override fun keyTyped(e: KeyEvent) = interceptEvent
+        override fun mouseEntered(e: MouseEvent) = interceptEvent
+        override fun keyPressed(e: KeyEvent) = interceptEvent
+        override fun mouseWheelMoved(e: MouseWheelEvent) = interceptEvent
+        override fun mouseReleased(e: MouseEvent) = interceptEvent
+        override fun mouseDragged(e: MouseEvent) = interceptEvent
+        override fun mouseExited(e: MouseEvent) = interceptEvent
+        override fun keyReleased(e: KeyEvent) = interceptEvent
+        override fun mousePressed(e: MouseEvent) = interceptEvent
     }
 
     companion object {
