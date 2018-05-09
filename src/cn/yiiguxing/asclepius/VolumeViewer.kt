@@ -230,21 +230,10 @@ class VolumeViewer : vtkJoglCanvasComponent() {
     }
 
     private fun showSurfaceDialog() {
-        SurfaceDialog.show(component) {
-            val color = if (surfaceActors.isNotEmpty()) {
-                val (hue, saturation, brightness) = with(Color.random.toAWTColor()) {
-                    AWTColor.RGBtoHSB(red, green, blue, null)
-                }
-                AWTColor.getHSBColor(hue, saturation, maxOf(brightness, 0.65f)).toColor()
-            } else {
-                Color.WHITE
-            }
-
-            createAndAddSurface(it, color = color)
-        }
+        SurfaceDialog.show(component, ::createAndAddSurface)
     }
 
-    private fun createAndAddSurface(surfaceInfo: SurfaceInfo, color: Color = Color.WHITE) {
+    private fun createAndAddSurface(surfaceInfo: SurfaceInfo) {
         val contourFilter = vtkContourFilter().apply {
             SetInputData(imageData)
             SetValue(0, surfaceInfo.contourValue)
@@ -271,7 +260,7 @@ class VolumeViewer : vtkJoglCanvasComponent() {
         val actor = vtkActor().apply {
             SetMapper(mapper)
             GetProperty().apply {
-                SetDiffuseColor(color.red, color.green, color.blue)
+                SetDiffuseColor(surfaceInfo.color.red, surfaceInfo.color.green, surfaceInfo.color.blue)
                 SetSpecular(.1)
                 SetSpecularPower(30.0)
             }

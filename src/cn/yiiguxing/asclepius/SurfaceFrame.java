@@ -11,6 +11,7 @@ public class SurfaceFrame extends JDialog {
     protected JCheckBox enableSmoothingCheckBox;
     protected JComboBox<Integer> noiComboBox;
     protected JLabel noiLabel;
+    protected JPanel colorPanel;
 
     protected SurfaceFrame(Frame owner) {
         super(owner);
