@@ -71,6 +71,7 @@ class SurfaceDialog(
                     dispose()
                 }
             })
+            isResizable = false
             isVisible = true
         }
     }
