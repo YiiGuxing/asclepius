@@ -5,25 +5,33 @@ import java.awt.Frame
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import javax.swing.JComponent
-import javax.swing.JOptionPane
-import javax.swing.KeyStroke
-import javax.swing.WindowConstants
+import javax.swing.*
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 
-class SurfaceContourPicker(
+class SurfaceDialog(
         owner: Frame? = null,
-        private val onPick: (Double) -> Unit
-) : SurfaceContourPickerFrame(owner) {
+        private val onCreateSurface: (SurfaceInfo) -> Unit
+) : SurfaceFrame(owner) {
 
     init {
-        title = "Contour Value"
+        title = "Create Surface"
         isModal = true
+        isResizable = false
         setContentPane(contentPane)
         getRootPane().defaultButton = buttonOK
 
-        textField.formatterFactory = DefaultFormatterFactory(NumberFormatter())
+        contourValue.formatterFactory = DefaultFormatterFactory(NumberFormatter())
+        noiComboBox.apply {
+            model = DefaultComboBoxModel(NUMBER_OF_SMOOTHING_ITERATIONS)
+            selectedIndex = 3
+        }
+        enableSmoothingCheckBox.addItemListener {
+            enableSmoothingCheckBox.isSelected.let {
+                noiLabel.isEnabled = it
+                noiComboBox.isEnabled = it
+            }
+        }
         buttonOK.addActionListener { onOK() }
         buttonCancel.addActionListener { onCancel() }
 
@@ -40,10 +48,12 @@ class SurfaceContourPicker(
     }
 
     private fun onOK() {
-        (textField.value as? Number)?.let {
-            onPick(it.toDouble())
-            dispose()
-        }
+        val contourVal = contourValue.value as? Number ?: return
+        val smoothing = enableSmoothingCheckBox.isSelected
+        val numberOfSmoothingIterations = noiComboBox.selectedItem as Int
+        val surfaceInfo = SurfaceInfo(contourVal.toDouble(), smoothing, numberOfSmoothingIterations)
+        onCreateSurface(surfaceInfo)
+        dispose()
     }
 
     private fun onCancel() {
@@ -51,9 +61,11 @@ class SurfaceContourPicker(
     }
 
     companion object {
-        inline fun show(c: Component, crossinline onPick: (Double) -> Unit) {
+        private val NUMBER_OF_SMOOTHING_ITERATIONS = arrayOf(5, 10, 20, 30, 50, 70, 100)
+
+        inline fun show(c: Component, crossinline onCreateSurface: (SurfaceInfo) -> Unit) {
             val frame = JOptionPane.getFrameForComponent(c)
-            SurfaceContourPicker(frame) { onPick(it) }.apply {
+            SurfaceDialog(frame) { onCreateSurface(it) }.apply {
                 pack()
                 setLocationRelativeTo(frame)
                 isVisible = true
@@ -63,7 +75,7 @@ class SurfaceContourPicker(
 }
 
 fun main(args: Array<String>) {
-    SurfaceContourPicker { println(it) }.apply {
+    SurfaceDialog { println(it) }.apply {
         pack()
         setLocationRelativeTo(null)
         isVisible = true

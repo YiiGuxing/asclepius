@@ -87,7 +87,7 @@ class VolumeViewer : vtkJoglCanvasComponent() {
         val popupMenu = JPopupMenu()
         popupMenu.add(JMenuItem("Add Surface").apply {
             setUI(WindowsMenuItemUI())
-            addActionListener { pickSurfaceContour() }
+            addActionListener { showSurfaceDialog() }
         })
         popupMenu.add(JMenuItem("Clear Surfaces").apply {
             setUI(WindowsMenuItemUI())
@@ -245,8 +245,8 @@ class VolumeViewer : vtkJoglCanvasComponent() {
         renderer.SetBackground(color.red, color.green, color.blue)
     }
 
-    private fun pickSurfaceContour() {
-        SurfaceContourPicker.show(component) {
+    private fun showSurfaceDialog() {
+        SurfaceDialog.show(component) {
             val color = if (surfaceActors.isNotEmpty()) {
                 val (hue, saturation, brightness) = with(Color.random.toAWTColor()) {
                     AWTColor.RGBtoHSB(red, green, blue, null)
@@ -260,17 +260,23 @@ class VolumeViewer : vtkJoglCanvasComponent() {
         }
     }
 
-    private fun createAndAddSurface(vararg contourValues: Double, color: Color = Color.WHITE) {
-        if (contourValues.isEmpty()) {
-            return
-        }
-
+    private fun createAndAddSurface(surfaceInfo: SurfaceInfo, color: Color = Color.WHITE) {
         val contourFilter = vtkContourFilter().apply {
             SetInputData(imageData)
-            contourValues.forEachIndexed { index, v -> SetValue(index, v) }
+            SetValue(0, surfaceInfo.contourValue)
+        }
+        val nextNode = if (surfaceInfo.smoothing) {
+            vtkWindowedSincPolyDataFilter().apply {
+                SetInputConnection(contourFilter.GetOutputPort())
+                SetNumberOfIterations(surfaceInfo.numberOfSmoothingIterations)
+                FeatureEdgeSmoothingOff()
+                BoundarySmoothingOn()
+            }
+        } else {
+            contourFilter
         }
         val normals = vtkPolyDataNormals().apply {
-            SetInputConnection(contourFilter.GetOutputPort())
+            SetInputConnection(nextNode.GetOutputPort())
             SetFeatureAngle(60.0)
         }
         val stripper = vtkStripper().apply { SetInputConnection(normals.GetOutputPort()) }
