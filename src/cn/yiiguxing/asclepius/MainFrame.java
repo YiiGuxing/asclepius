@@ -1,7 +1,5 @@
 package cn.yiiguxing.asclepius;
 
-import com.sun.java.swing.plaf.windows.WindowsScrollBarUI;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -17,10 +15,6 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         super("Asclepius");
-
-        axialScrollBar.setUI(new WindowsScrollBarUI());
-        coronalScrollBar.setUI(new WindowsScrollBarUI());
-        sagittalScrollBar.setUI(new WindowsScrollBarUI());
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());

@@ -2,9 +2,6 @@ package cn.yiiguxing.asclepius
 
 import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLEventListener
-import com.sun.java.swing.plaf.windows.WindowsMenuItemUI
-import com.sun.java.swing.plaf.windows.WindowsMenuUI
-import com.sun.java.swing.plaf.windows.WindowsRadioButtonMenuItemUI
 import vtk.*
 import vtk.extensions.VTK
 import vtk.rendering.jogl.vtkJoglCanvasComponent
@@ -83,50 +80,37 @@ class VolumeViewer : vtkJoglCanvasComponent() {
         })
     }
 
-    private fun createPopupMenu(): JPopupMenu {
-        val popupMenu = JPopupMenu()
-        popupMenu.add(JMenuItem("Add Surface").apply {
-            setUI(WindowsMenuItemUI())
-            addActionListener { showSurfaceDialog() }
-        })
-        popupMenu.add(JMenuItem("Clear Surfaces").apply {
-            setUI(WindowsMenuItemUI())
-            addActionListener { clearSurfaces() }
-        })
-        popupMenu.addSeparator()
+    private fun createPopupMenu(): JPopupMenu = JPopupMenu().apply {
+        add(JMenuItem("Add Surface").apply { addActionListener { showSurfaceDialog() } })
+        add(JMenuItem("Clear Surfaces").apply { addActionListener { clearSurfaces() } })
+        addSeparator()
 
         val group = ButtonGroup()
         val presetsMenu = JMenu("Raycasting Presets").apply {
-            setUI(WindowsMenuUI())
-
             add(JRadioButtonMenuItem("OFF", true).apply {
                 group.add(this)
-                setUI(WindowsRadioButtonMenuItemUI())
                 addActionListener { currentPreset = null }
             })
 
             Presets.rayCastingPresets.forEach { preset ->
                 add(JRadioButtonMenuItem(preset.name).apply {
                     group.add(this)
-                    setUI(WindowsRadioButtonMenuItemUI())
                     addActionListener { currentPreset = preset }
                 })
             }
         }
 
-        popupMenu.add(presetsMenu)
-        popupMenu.addPopupMenuListener(object : PopupMenuListener {
+        add(presetsMenu)
+        addPopupMenuListener(object : PopupMenuListener {
             override fun popupMenuWillBecomeInvisible(e: PopupMenuEvent) = Unit
             override fun popupMenuCanceled(e: PopupMenuEvent) = Unit
             override fun popupMenuWillBecomeVisible(e: PopupMenuEvent) {
                 val isEnabled = imageData != null
-                for (i in 0 until popupMenu.componentCount) {
-                    popupMenu.getComponent(i).isEnabled = isEnabled
+                for (i in 0 until componentCount) {
+                    getComponent(i).isEnabled = isEnabled
                 }
             }
         })
-
-        return popupMenu
     }
 
     var imageData: vtkImageData? = null
