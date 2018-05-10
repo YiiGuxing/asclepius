@@ -6,6 +6,7 @@ import vtk.rendering.vtkAbstractEventInterceptor
 import vtk.vtkAlgorithmOutput
 import vtk.vtkDICOMImageReader
 import java.awt.BorderLayout
+import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import java.io.File
 import javax.swing.JScrollBar
@@ -54,18 +55,46 @@ class AsclepiusFrame(dcmDir: File) : MainFrame() {
             }
 
             renderer.SetUseFXAA(true)
-            interactorForwarder.eventInterceptor = object : vtkAbstractEventInterceptor() {
-                override fun mouseWheelMoved(e: MouseWheelEvent): Boolean {
-                    val increment = when {
-                        e.wheelRotation > 0 -> 1
-                        e.wheelRotation < 0 -> -1
-                        else -> return true
-                    }
+            setupEventInterceptor(scrollBar)
+        }
+    }
 
-                    scrollBar.value = scrollBar.value + increment
+    private fun VTKJoglCanvasImageViewer.setupEventInterceptor(scrollBar: JScrollBar) {
+        interactorForwarder.eventInterceptor = object : vtkAbstractEventInterceptor() {
+            private var lastX: Int = 0
+            private var lastY: Int = 0
+            private var adjustWWWC = false
 
-                    return true
+            override fun mousePressed(e: MouseEvent): Boolean {
+                lastX = e.x
+                lastY = e.y
+                adjustWWWC = e.button == MouseEvent.BUTTON1
+                return super.mousePressed(e)
+            }
+
+            override fun mouseWheelMoved(e: MouseWheelEvent): Boolean {
+                val increment = when {
+                    e.wheelRotation > 0 -> 1
+                    e.wheelRotation < 0 -> -1
+                    else -> return true
                 }
+
+                scrollBar.value = scrollBar.value + increment
+                return true
+            }
+
+            override fun mouseDragged(e: MouseEvent): Boolean {
+                if (!adjustWWWC) {
+                    return super.mouseDragged(e)
+                }
+
+                colorWindow += e.x - lastX
+                colorLevel += e.y - lastY
+                lastX = e.x
+                lastY = e.y
+
+                Render()
+                return true
             }
         }
     }
