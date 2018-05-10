@@ -88,8 +88,8 @@ class AsclepiusFrame(dcmDir: File) : MainFrame() {
                     return super.mouseDragged(e)
                 }
 
-                colorWindow += e.x - lastX
                 colorLevel += e.y - lastY
+                colorWindow = maxOf(0.0, colorWindow + e.x - lastX)
                 lastX = e.x
                 lastY = e.y
 
