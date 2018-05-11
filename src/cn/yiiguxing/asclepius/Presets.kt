@@ -8,20 +8,25 @@
 
 package cn.yiiguxing.asclepius
 
+import cn.yiiguxing.asclepius.util.readJson
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.io.File
-import java.io.FileReader
 
 
 object Presets {
 
     private val clutList = mutableListOf<ColorLookUpTable>()
     private val presetsList = mutableListOf<RayCastingPreset>()
+    private val lutList = mutableListOf<LookUpTablePreset>()
 
     val colorLookUpTables: List<ColorLookUpTable> get() = clutList
     val rayCastingPresets: List<RayCastingPreset> get() = presetsList
+    val defaultLookUpTables: List<LookUpTablePreset> get() = lutList
 
     fun getColorLookUpTable(name: String) = clutList.find { name == it.name }
+
+    fun getDefaultLookUpTable(name: String) = lutList.find { name == it.name }
 
     fun getRayCastingPreset(name: String) = presetsList.find { name == it.name }
 
@@ -31,26 +36,37 @@ object Presets {
         val presetsDir = File("presets")
         val colorsPresetsDir = File(presetsDir, "colors")
         val rayCastingPresetsDir = File(presetsDir, "ray-casting")
+        val defaultLookupTablesFile = File(presetsDir, "default_lookup_tables.json")
+
+        defaultLookupTablesFile
+                .readJson<List<LookUpTablePreset>>(gson, LookUpTablePresetList().type)
+                .sortedBy { it.name }
+                .let { presets ->
+                    lutList.apply {
+                        clear()
+                        addAll(presets)
+                    }
+                }
 
         colorsPresetsDir
                 .listFiles()
-                ?.map { gson.fromJson(FileReader(it), ColorLookUpTableInner::class.java).asColorLookUpTable() }
+                ?.map { it.readJson<ColorLookUpTableInner>(gson).asColorLookUpTable() }
                 ?.sortedBy { it.name }
-                ?.let {
+                ?.let { presets ->
                     clutList.apply {
                         clear()
-                        addAll(it)
+                        addAll(presets)
                     }
                 }
 
         rayCastingPresetsDir
                 .listFiles()
-                ?.map { gson.fromJson(FileReader(it), RayCastingPreset::class.java) }
+                ?.map { it.readJson<RayCastingPreset>(gson) }
                 ?.sortedBy { it.name }
-                ?.let {
+                ?.let { presets ->
                     presetsList.apply {
                         clear()
-                        addAll(it)
+                        addAll(presets)
                     }
                 }
     }
@@ -119,11 +135,7 @@ private data class ColorLookUpTableInner(
         val name: String,
         val red: List<Int>,
         val green: List<Int>,
-        val blue: List<Int>) {
-
-    @Suppress("unused")
-    private constructor() : this("Empty", emptyList<Int>(), emptyList<Int>(), emptyList<Int>())
-}
+        val blue: List<Int>)
 
 private fun ColorLookUpTableInner.asColorLookUpTable(): ColorLookUpTable {
     val (name, red, green, blue) = this
@@ -136,13 +148,27 @@ private fun ColorLookUpTableInner.asColorLookUpTable(): ColorLookUpTable {
 
 data class ColorLookUpTable(val name: String, val colorList: List<Color>) {
 
-    val vtkLookupTable: vtk.vtkLookupTable by lazy {
-        vtk.vtkLookupTable().apply {
+    val vtkLookupTable
+        get() = vtk.vtkLookupTable().apply {
             SetNumberOfTableValues(colorList.size)
             colorList.forEachIndexed { index, color ->
                 SetTableValue(index, color.red, color.green, color.blue, 1.0)
             }
         }
-    }
+
+}
+
+private class LookUpTablePresetList : TypeToken<List<LookUpTablePreset>>()
+
+data class LookUpTablePreset(val name: String, private val ranges: List<Double>) {
+
+    val vtkLookupTable
+        get() = vtk.vtkLookupTable().apply {
+            val ranges = ranges
+            SetSaturationRange(ranges[0], ranges[1])
+            SetHueRange(ranges[2], ranges[3])
+            SetValueRange(ranges[4], ranges[5])
+            Build()
+        }
 
 }
