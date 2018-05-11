@@ -92,6 +92,10 @@ open class VTKImageViewer<T : Component>(renderWindow: vtkRenderWindow, glContai
         set(value) = windowLevel.SetLevel(value)
         get() = windowLevel.GetLevel()
 
+    var lookupTable: vtkScalarsToColors?
+        set(value) = imageActor.GetProperty().SetLookupTable(value)
+        get() = imageActor.GetProperty().GetLookupTable()
+
     enum class SliceOrientation(val value: Int) {
         YZ(0),
         XZ(1),
