@@ -18,8 +18,8 @@ object Presets {
     private val clutList = mutableListOf<ColorLookUpTable>()
     private val presetsList = mutableListOf<RayCastingPreset>()
 
-    val colorLookUpTables get() = clutList
-    val rayCastingPresets get() = presetsList
+    val colorLookUpTables: List<ColorLookUpTable> get() = clutList
+    val rayCastingPresets: List<RayCastingPreset> get() = presetsList
 
     fun getColorLookUpTable(name: String) = clutList.find { name == it.name }
 
@@ -34,7 +34,7 @@ object Presets {
 
         colorsPresetsDir
                 .listFiles()
-                ?.map { gson.fromJson(FileReader(it), ColorLookUpTable::class.java) }
+                ?.map { gson.fromJson(FileReader(it), ColorLookUpTableInner::class.java).asColorLookUpTable() }
                 ?.sortedBy { it.name }
                 ?.let {
                     clutList.apply {
@@ -115,14 +115,34 @@ private val defaultColorList = (0..255).map { Color(it / 255.0, it / 255.0, it /
 val RayCastingPreset.colorLookUpTable: List<Color>
     get() = clut?.let { Presets.getColorLookUpTable(it) }?.colorList ?: defaultColorList
 
-data class ColorLookUpTable(val name: String, val red: List<Int>, val green: List<Int>, val blue: List<Int>) {
+private data class ColorLookUpTableInner(
+        val name: String,
+        val red: List<Int>,
+        val green: List<Int>,
+        val blue: List<Int>) {
 
     @Suppress("unused")
     private constructor() : this("Empty", emptyList<Int>(), emptyList<Int>(), emptyList<Int>())
+}
 
-    val colorList: List<Color> by lazy {
-        val green = green
-        val blue = blue
-        red.mapIndexed { index, r -> Color(r / 255.0, green[index] / 255.0, blue[index] / 255.0) }
+private fun ColorLookUpTableInner.asColorLookUpTable(): ColorLookUpTable {
+    val (name, red, green, blue) = this
+    val colorList = red.mapIndexed { index, r ->
+        Color(r / 255.0, green[index] / 255.0, blue[index] / 255.0)
     }
+
+    return ColorLookUpTable(name, colorList)
+}
+
+data class ColorLookUpTable(val name: String, val colorList: List<Color>) {
+
+    val vtkLookupTable: vtk.vtkLookupTable by lazy {
+        vtk.vtkLookupTable().apply {
+            SetNumberOfTableValues(colorList.size)
+            colorList.forEachIndexed { index, color ->
+                SetTableValue(index, color.red, color.green, color.blue, 1.0)
+            }
+        }
+    }
+
 }
