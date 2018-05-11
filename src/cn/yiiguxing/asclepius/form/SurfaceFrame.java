@@ -1,4 +1,4 @@
-package cn.yiiguxing.asclepius;
+package cn.yiiguxing.asclepius.form;
 
 import javax.swing.*;
 import java.awt.*;
