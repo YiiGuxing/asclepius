@@ -7,7 +7,13 @@ import vtk.vtkAlgorithmOutput
 import java.awt.BorderLayout
 import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
+import javax.swing.ButtonGroup
+import javax.swing.JMenu
+import javax.swing.JPopupMenu
+import javax.swing.JRadioButtonMenuItem
 import javax.swing.border.LineBorder
+import javax.swing.event.PopupMenuEvent
+import javax.swing.event.PopupMenuListener
 
 /**
  * SliceViewer
@@ -17,6 +23,7 @@ import javax.swing.border.LineBorder
 class SliceViewer(title: String) : SliceViewerForm() {
 
     private val viewer = VTKJoglCanvasImageViewer()
+    private val popupMenu = createPopupMenu()
 
     var sliceOrientation
         get() = viewer.sliceOrientation
@@ -60,6 +67,37 @@ class SliceViewer(title: String) : SliceViewerForm() {
         }
     }
 
+    private fun createPopupMenu(): JPopupMenu = JPopupMenu().apply {
+        val group = ButtonGroup()
+        val pseudoColorMenu = JMenu("Pseudo Color").apply {
+            add(JRadioButtonMenuItem("OFF", true).apply {
+                group.add(this)
+                addActionListener { viewer.lookupTable = null }
+            })
+
+            val lookUpTables = Presets.defaultLookUpTables.map { it.name to it.vtkLookupTable } +
+                    Presets.colorLookUpTables.map { it.name to it.vtkLookupTable }
+            lookUpTables.sortedBy { it.first }.forEach { (name, lookupTable) ->
+                add(JRadioButtonMenuItem(name).apply {
+                    group.add(this)
+                    addActionListener { viewer.lookupTable = lookupTable }
+                })
+            }
+        }
+
+        add(pseudoColorMenu)
+        addPopupMenuListener(object : PopupMenuListener {
+            override fun popupMenuWillBecomeInvisible(e: PopupMenuEvent) = Unit
+            override fun popupMenuCanceled(e: PopupMenuEvent) = Unit
+            override fun popupMenuWillBecomeVisible(e: PopupMenuEvent) {
+                val isEnabled = viewer.sliceRange != null
+                for (i in 0 until componentCount) {
+                    getComponent(i).isEnabled = isEnabled
+                }
+            }
+        })
+    }
+
     private inner class EventInterceptor : vtkAbstractEventInterceptor() {
         private var lastX: Int = 0
         private var lastY: Int = 0
@@ -70,6 +108,15 @@ class SliceViewer(title: String) : SliceViewerForm() {
             lastY = e.y
             adjustWWWC = e.button == MouseEvent.BUTTON1
             return super.mousePressed(e)
+        }
+
+        override fun mouseClicked(e: MouseEvent): Boolean {
+            return if (e.button == MouseEvent.BUTTON3) {
+                popupMenu.show(e.component, e.x, e.y)
+                true
+            } else {
+                super.mousePressed(e)
+            }
         }
 
         override fun mouseWheelMoved(e: MouseWheelEvent): Boolean {
