@@ -91,22 +91,6 @@ enum class Shading(val ambient: Double, val diffuse: Double, val specular: Doubl
     ENDOSCOPY(0.12, 0.64, 0.73, 50.0)
 }
 
-typealias AWTColor = java.awt.Color
-
-fun AWTColor.toColor() = Color(red / 255.0, green / 255.0, blue / 255.0)
-
-data class Color(val red: Double, val green: Double, val blue: Double) {
-
-    fun toAWTColor() = AWTColor(red.toFloat(), green.toFloat(), blue.toFloat())
-
-    companion object {
-        val BLACK = Color(0.0, 0.0, 0.0)
-        val WHITE = Color(1.0, 1.0, 1.0)
-
-        val random get() = Color(Math.random(), Math.random(), Math.random())
-    }
-}
-
 data class Point(val x: Double, val y: Double)
 
 @Suppress("ArrayInDataClass")
