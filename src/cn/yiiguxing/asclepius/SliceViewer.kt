@@ -1,10 +1,12 @@
 package cn.yiiguxing.asclepius
 
 import cn.yiiguxing.asclepius.form.SliceViewerForm
+import cn.yiiguxing.asclepius.widget.MaximizablePanel
 import vtk.extensions.jogl.VTKJoglCanvasImageViewer
 import vtk.rendering.vtkAbstractEventInterceptor
 import vtk.vtkAlgorithmOutput
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import javax.swing.ButtonGroup
@@ -20,7 +22,7 @@ import javax.swing.event.PopupMenuListener
  *
  * Created by Yii.Guxing on 2018/05/11
  */
-class SliceViewer(title: String) : SliceViewerForm() {
+class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
 
     private val viewer = VTKJoglCanvasImageViewer()
     private val popupMenu = createPopupMenu()
@@ -31,6 +33,11 @@ class SliceViewer(title: String) : SliceViewerForm() {
             viewer.sliceOrientation = value
         }
 
+    override var maximizeActionListener: MaximizablePanel.MaximizeActionListener? = null
+    private var _isMaximize = false
+    override val isMaximize: Boolean
+        get() = _isMaximize
+
     init {
         viewer.apply {
             renderer.SetUseFXAA(true)
@@ -40,6 +47,27 @@ class SliceViewer(title: String) : SliceViewerForm() {
         titleLabel.text = title
         contentPanel.add(viewer.component, BorderLayout.CENTER)
         scrollBar.addAdjustmentListener { viewer.slice = it.value }
+
+        initMaximizeButton()
+    }
+
+    private fun initMaximizeButton() {
+        with(maximizeButton) {
+            hoveringColor = Color(0xE6E6E6)
+            actionListener = { fireToggleMaximize() }
+        }
+    }
+
+    override fun onMaximize(): Boolean {
+        _isMaximize = true
+        maximizeButton.icon = Icons.RESTORE
+        return true
+    }
+
+    override fun onRestore(): Boolean {
+        _isMaximize = false
+        maximizeButton.icon = Icons.MAXIMIZE
+        return true
     }
 
     fun setBorder(color: AWTColor) {

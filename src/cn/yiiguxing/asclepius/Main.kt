@@ -8,6 +8,7 @@ package cn.yiiguxing.asclepius
 
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel
 import vtk.extensions.VTK
+import vtk.vtkDICOMImageReader
 import java.io.File
 import javax.swing.UIManager
 
@@ -18,11 +19,19 @@ fun main(args: Array<String>) {
 
     UIManager.setLookAndFeel(WindowsLookAndFeel())
 
-    // TODO 指定DICOM序列目录（目录内所有DICOM文件必须属于同一序列），由于使用的是vtkDICOMImageReader，所以一些DICOM文件无法读取
-    val dcmDir = File(args[0])
-    AsclepiusFrame(dcmDir).apply {
+    val frame = AsclepiusFrame().apply {
         setSize(1280, 900)
         setLocationRelativeTo(null)
-        isVisible = true
     }
+
+    // TODO 指定DICOM序列目录（目录内所有DICOM文件必须属于同一序列），由于使用的是vtkDICOMImageReader，所以一些DICOM文件无法读取
+    val dcmDir = File(args[0])
+    val reader = vtkDICOMImageReader().apply {
+        SetDirectoryName(dcmDir.absolutePath)
+        SetDataByteOrderToLittleEndian()
+        Update()
+    }
+
+    frame.setReader(reader)
+    frame.isVisible = true
 }
