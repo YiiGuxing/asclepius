@@ -1,5 +1,6 @@
 package cn.yiiguxing.asclepius
 
+import cn.yiiguxing.asclepius.dialog.SurfaceDialog
 import com.jogamp.opengl.GLAutoDrawable
 import com.jogamp.opengl.GLEventListener
 import vtk.*

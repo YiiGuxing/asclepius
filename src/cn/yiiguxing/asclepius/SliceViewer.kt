@@ -1,5 +1,6 @@
 package cn.yiiguxing.asclepius
 
+import cn.yiiguxing.asclepius.dialog.WindowingDialog
 import cn.yiiguxing.asclepius.form.SliceViewerForm
 import cn.yiiguxing.asclepius.widget.MaximizablePanel
 import vtk.extensions.jogl.VTKJoglCanvasImageViewer

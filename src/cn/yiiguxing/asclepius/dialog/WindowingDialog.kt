@@ -1,5 +1,6 @@
-package cn.yiiguxing.asclepius
+package cn.yiiguxing.asclepius.dialog
 
+import cn.yiiguxing.asclepius.WindowLevel
 import cn.yiiguxing.asclepius.form.WindowingDialogForm
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel
 import java.awt.Component

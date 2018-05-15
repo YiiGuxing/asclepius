@@ -1,6 +1,9 @@
-package cn.yiiguxing.asclepius
+package cn.yiiguxing.asclepius.dialog
 
+import cn.yiiguxing.asclepius.AWTColor
+import cn.yiiguxing.asclepius.SurfaceInfo
 import cn.yiiguxing.asclepius.form.SurfaceFrame
+import cn.yiiguxing.asclepius.toColor
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel
 import java.awt.Component
 import java.awt.Dimension
