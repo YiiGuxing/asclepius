@@ -13,7 +13,7 @@ class WindowingDialog private constructor(
         owner: Frame? = null,
         initWindowWidth: Double = 255.0,
         initWindowLevel: Double = 127.0
-) : WindowingDialogForm(owner, "Edit Windowing") {
+) : WindowingDialogForm(owner) {
 
     var windowLevel: WindowLevel? = null
         private set

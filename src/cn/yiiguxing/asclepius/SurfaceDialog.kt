@@ -12,10 +12,10 @@ import javax.swing.colorchooser.ColorChooserComponentFactory
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 
-class SurfaceDialog(
-        owner: Frame? = null,
-        private val onCreateSurface: (SurfaceInfo) -> Unit
-) : SurfaceFrame(owner) {
+class SurfaceDialog private constructor(owner: Frame? = null) : SurfaceFrame(owner) {
+
+    var surfaceInfo: SurfaceInfo? = null
+        private set
 
     init {
         title = "Create Surface"
@@ -82,24 +82,26 @@ class SurfaceDialog(
         val color = colorPanel.background.toColor()
         val smoothing = enableSmoothingCheckBox.isSelected
         val numberOfSmoothingIterations = noiComboBox.selectedItem as Int
-        val surfaceInfo = SurfaceInfo(contourVal.toDouble(), color, smoothing, numberOfSmoothingIterations)
-        onCreateSurface(surfaceInfo)
+        surfaceInfo = SurfaceInfo(contourVal.toDouble(), color, smoothing, numberOfSmoothingIterations)
         dispose()
     }
 
     private fun onCancel() {
+        surfaceInfo = null
         dispose()
     }
 
     companion object {
         private val NUMBER_OF_SMOOTHING_ITERATIONS = arrayOf(5, 10, 20, 30, 50, 70, 100)
 
-        inline fun show(c: Component, crossinline onCreateSurface: (SurfaceInfo) -> Unit) {
-            val frame = JOptionPane.getFrameForComponent(c)
-            SurfaceDialog(frame) { onCreateSurface(it) }.apply {
+        fun show(component: Component? = null): SurfaceInfo? {
+            val frame = component?.let { JOptionPane.getFrameForComponent(it) }
+            return with(SurfaceDialog(frame)) {
                 pack()
                 setLocationRelativeTo(frame)
                 isVisible = true
+
+                surfaceInfo
             }
         }
     }
@@ -130,10 +132,6 @@ private class ColorChooser(private val initialColor: AWTColor = AWTColor.white) 
 
 fun main(args: Array<String>) {
     UIManager.setLookAndFeel(WindowsLookAndFeel())
-    SurfaceDialog { println(it) }.apply {
-        pack()
-        setLocationRelativeTo(null)
-        isVisible = true
-    }
+    println(SurfaceDialog.show())
     System.exit(0)
 }

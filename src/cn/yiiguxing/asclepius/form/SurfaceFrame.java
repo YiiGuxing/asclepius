@@ -14,6 +14,6 @@ public class SurfaceFrame extends JDialog {
     protected JPanel colorPanel;
 
     protected SurfaceFrame(Frame owner) {
-        super(owner);
+        super(owner, "Create Surface", true);
     }
 }

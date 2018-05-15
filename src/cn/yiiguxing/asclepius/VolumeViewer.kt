@@ -231,7 +231,7 @@ class VolumeViewer : vtkJoglCanvasComponent() {
     }
 
     private fun showSurfaceDialog() {
-        SurfaceDialog.show(component, ::createAndAddSurface)
+        SurfaceDialog.show(component)?.let { createAndAddSurface(it) }
     }
 
     private fun createAndAddSurface(surfaceInfo: SurfaceInfo) {

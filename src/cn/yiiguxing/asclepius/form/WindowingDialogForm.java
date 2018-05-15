@@ -10,7 +10,7 @@ public class WindowingDialogForm extends JDialog {
     protected JSpinner windowLevelSpinner;
     protected JSpinner windowWidthSpinner;
 
-    protected WindowingDialogForm(Frame owner, String title) {
-        super(owner, title, true);
+    protected WindowingDialogForm(Frame owner) {
+        super(owner, "Edit Windowing", true);
     }
 }
