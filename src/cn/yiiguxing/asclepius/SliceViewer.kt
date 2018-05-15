@@ -112,8 +112,18 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
         }
     }
 
+    private fun showWindowingDialog() {
+        WindowingDialog.show(this, viewer.colorWindow, viewer.colorLevel)
+                ?.let { (windowWidth, windowLevel) -> setWindowLevel(windowWidth, windowLevel) }
+    }
+
     private fun createPopupMenu(): JPopupMenu = JPopupMenu().apply {
         val windowLevelMenu = JMenu("Window/Level").apply {
+            add(JMenuItem("Custom").apply {
+                addActionListener { showWindowingDialog() }
+            })
+            addSeparator()
+
             Presets.windowLevel.forEach { name, (windowWidth, windowLevel) ->
                 add(JMenuItem(name).apply {
                     addActionListener { setWindowLevel(windowWidth, windowLevel) }
