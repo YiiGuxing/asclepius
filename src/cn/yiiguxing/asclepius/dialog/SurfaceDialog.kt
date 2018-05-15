@@ -21,8 +21,6 @@ class SurfaceDialog private constructor(owner: Frame? = null) : SurfaceFrame(own
         private set
 
     init {
-        title = "Create Surface"
-        isModal = true
         isResizable = false
         setContentPane(contentPane)
         getRootPane().defaultButton = buttonOK
