@@ -24,6 +24,17 @@ object Presets {
     val rayCastingPresets: List<RayCastingPreset> get() = presetsList
     val defaultLookUpTables: List<LookUpTablePreset> get() = lutList
 
+    val windowLevel: Map<String, WindowLevel> = mapOf(
+            "Abdomen" to WindowLevel(400.0, 10.0),
+            "Bone" to WindowLevel(2500.0, 300.0),
+            "Brain" to WindowLevel(80.0, 40.0),
+            "Felsenbein" to WindowLevel(4000.0, 500.0),
+            "Lung" to WindowLevel(1600.0, -400.0),
+            "Mediastinum" to WindowLevel(450.0, 10.0),
+            "Skull" to WindowLevel(95.0, 25.0),
+            "Spine" to WindowLevel(300.0, 20.0)
+    )
+
     fun getColorLookUpTable(name: String) = clutList.find { name == it.name }
 
     fun getDefaultLookUpTable(name: String) = lutList.find { name == it.name }
@@ -90,6 +101,8 @@ enum class Shading(val ambient: Double, val diffuse: Double, val specular: Doubl
     GLOSSY_BONE(0.15, 0.24, 1.17, 6.98),
     ENDOSCOPY(0.12, 0.64, 0.73, 50.0)
 }
+
+data class WindowLevel(val windowWidth: Double, val windowLevel: Double)
 
 data class Point(val x: Double, val y: Double)
 

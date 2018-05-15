@@ -9,13 +9,11 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
-import javax.swing.ButtonGroup
-import javax.swing.JMenu
-import javax.swing.JPopupMenu
-import javax.swing.JRadioButtonMenuItem
+import javax.swing.*
 import javax.swing.border.LineBorder
 import javax.swing.event.PopupMenuEvent
 import javax.swing.event.PopupMenuListener
+import kotlin.math.abs
 
 /**
  * SliceViewer
@@ -50,6 +48,17 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
 
         initMaximizeButton()
     }
+
+    private var isInverse = false
+        set(value) {
+            if (value != field) {
+                field = value
+                with(viewer) {
+                    colorWindow = -colorWindow
+                    Render()
+                }
+            }
+        }
 
     private fun initMaximizeButton() {
         with(maximizeButton) {
@@ -95,11 +104,27 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
         }
     }
 
+    private fun setWindowLevel(windowWidth: Double, windowLevel: Double) {
+        with(viewer) {
+            colorLevel = windowLevel
+            colorWindow = if (isInverse) -windowWidth else windowWidth
+            Render()
+        }
+    }
+
     private fun createPopupMenu(): JPopupMenu = JPopupMenu().apply {
-        val group = ButtonGroup()
+        val windowLevelMenu = JMenu("Window/Level").apply {
+            Presets.windowLevel.forEach { name, (windowWidth, windowLevel) ->
+                add(JMenuItem(name).apply {
+                    addActionListener { setWindowLevel(windowWidth, windowLevel) }
+                })
+            }
+        }
+
+        val pseudoColorGroup = ButtonGroup()
         val pseudoColorMenu = JMenu("Pseudo Color").apply {
             add(JRadioButtonMenuItem("OFF", true).apply {
-                group.add(this)
+                pseudoColorGroup.add(this)
                 addActionListener { viewer.lookupTable = null }
             })
             addSeparator()
@@ -108,13 +133,17 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
                     Presets.colorLookUpTables.map { it.name to it.vtkLookupTable }
             lookUpTables.sortedBy { it.first }.forEach { (name, lookupTable) ->
                 add(JRadioButtonMenuItem(name).apply {
-                    group.add(this)
+                    pseudoColorGroup.add(this)
                     addActionListener { viewer.lookupTable = lookupTable }
                 })
             }
         }
 
+        add(windowLevelMenu)
         add(pseudoColorMenu)
+        addSeparator()
+        add(JCheckBoxMenuItem("Inverse").apply { addActionListener { isInverse = isSelected } })
+
         addPopupMenuListener(object : PopupMenuListener {
             override fun popupMenuWillBecomeInvisible(e: PopupMenuEvent) = Unit
             override fun popupMenuCanceled(e: PopupMenuEvent) = Unit
@@ -166,7 +195,7 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
 
             with(viewer) {
                 colorLevel += e.y - lastY
-                colorWindow = maxOf(0.0, colorWindow + e.x - lastX)
+                colorWindow = maxOf(1.0, abs(colorWindow) + e.x - lastX) * if (isInverse) -1 else 1
                 Render()
             }
 

@@ -12,8 +12,6 @@ data class Color(val red: Double, val green: Double, val blue: Double) {
     companion object {
         val BLACK = Color(0.0, 0.0, 0.0)
         val WHITE = Color(1.0, 1.0, 1.0)
-
-        val random get() = Color(Math.random(), Math.random(), Math.random())
     }
 }
 
