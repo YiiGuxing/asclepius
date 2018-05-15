@@ -102,6 +102,7 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
                 group.add(this)
                 addActionListener { viewer.lookupTable = null }
             })
+            addSeparator()
 
             val lookUpTables = Presets.defaultLookUpTables.map { it.name to it.vtkLookupTable } +
                     Presets.colorLookUpTables.map { it.name to it.vtkLookupTable }
