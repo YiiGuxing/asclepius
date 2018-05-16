@@ -40,6 +40,8 @@ class AsclepiusFrame : JFrame("Asclepius") {
         sagittalViewer = createViewer("Sagittal", contentPanel, SliceOrientation.XZ, Color.BLUE, maximizeAction)
         volumeViewer = VolumePanel().apply { maximizeActionListener = maximizeAction }
 
+        SliceViewer.MultiSliceViewerSynchronizer().register(axialViewer, coronalViewer, sagittalViewer)
+
         contentPanel.add(volumeViewer)
         add(contentPanel, BorderLayout.CENTER)
     }

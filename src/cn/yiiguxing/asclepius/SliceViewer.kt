@@ -32,6 +32,8 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
             viewer.sliceOrientation = value
         }
 
+    var synchronizer: Synchronizer = DefaultSynchronizer()
+
     override var maximizeActionListener: MaximizablePanel.MaximizeActionListener? = null
     private var _isMaximize = false
     override val isMaximize: Boolean
@@ -123,7 +125,7 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
 
     private fun showWindowingDialog() {
         WindowingDialog.show(this, viewer.colorWindow, viewer.colorLevel)
-                ?.let { (windowWidth, windowLevel) -> setWindowLevel(windowWidth, windowLevel) }
+                ?.let { (windowWidth, windowLevel) -> synchronizer.setWindowLevel(windowWidth, windowLevel) }
     }
 
     private fun createPopupMenu(): JPopupMenu = JPopupMenu().apply {
@@ -135,7 +137,7 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
 
             Presets.windowLevel.forEach { name, (windowWidth, windowLevel) ->
                 add(JMenuItem(name).apply {
-                    addActionListener { setWindowLevel(windowWidth, windowLevel) }
+                    addActionListener { synchronizer.setWindowLevel(windowWidth, windowLevel) }
                 })
             }
         }
@@ -146,7 +148,7 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
             add(JRadioButtonMenuItem("OFF", true).apply {
                 itemMap[null] = this
                 pseudoColorGroup.add(this)
-                addActionListener { lookupTablePreset = null }
+                addActionListener { synchronizer.setLookupTable(null) }
             })
             addSeparator()
 
@@ -154,13 +156,13 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
                 add(JRadioButtonMenuItem(name).apply {
                     itemMap[name] = this
                     pseudoColorGroup.add(this)
-                    addActionListener { lookupTablePreset = name }
+                    addActionListener { synchronizer.setLookupTable(name) }
                 })
             }
         }
 
         val inverseItem = JCheckBoxMenuItem("Inverse").apply {
-            addActionListener { isInverse = isSelected }
+            addActionListener { synchronizer.setInverse(isSelected) }
         }
 
         add(windowLevelMenu)
@@ -220,11 +222,9 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
                 return super.mouseDragged(e)
             }
 
-            with(viewer) {
-                colorLevel += e.y - lastY
-                colorWindow = maxOf(1.0, abs(colorWindow) + e.x - lastX) * if (isInverse) -1 else 1
-                Render()
-            }
+            val wl = viewer.colorLevel + e.y - lastY
+            val ww = maxOf(1.0, abs(viewer.colorWindow) + e.x - lastX)
+            synchronizer.setWindowLevel(ww, wl)
 
             lastX = e.x
             lastY = e.y
@@ -233,4 +233,64 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
         }
     }
 
+    inner class DefaultSynchronizer : Synchronizer {
+        override fun setWindowLevel(colorWindow: Double, colorLevel: Double) {
+            this@SliceViewer.setWindowLevel(colorWindow, colorLevel)
+        }
+
+        override fun setInverse(inverse: Boolean) {
+            isInverse = inverse
+        }
+
+        override fun setLookupTable(name: String?) {
+            lookupTablePreset = name
+        }
+    }
+
+    interface Synchronizer {
+
+        fun setWindowLevel(colorWindow: Double, colorLevel: Double)
+
+        fun setInverse(inverse: Boolean)
+
+        fun setLookupTable(name: String?)
+
+    }
+
+    class MultiSliceViewerSynchronizer : Synchronizer {
+
+        private val viewers = ArrayList<SliceViewer>()
+
+        fun register(vararg viewers: SliceViewer) {
+            this.viewers.addAll(viewers)
+            for (viewer in viewers) {
+                viewer.synchronizer = this
+            }
+        }
+
+        @Suppress("unused")
+        fun unregister(viewer: SliceViewer) {
+            if (viewers.remove(viewer)) {
+                viewer.synchronizer = viewer.DefaultSynchronizer()
+            }
+        }
+
+        override fun setWindowLevel(colorWindow: Double, colorLevel: Double) {
+            for (viewer in viewers) {
+                viewer.setWindowLevel(colorWindow, colorLevel)
+            }
+        }
+
+        override fun setInverse(inverse: Boolean) {
+            for (viewer in viewers) {
+                viewer.isInverse = inverse
+            }
+        }
+
+        override fun setLookupTable(name: String?) {
+            for (viewer in viewers) {
+                viewer.lookupTablePreset = name
+            }
+        }
+    }
 }
