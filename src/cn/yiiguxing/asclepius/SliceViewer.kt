@@ -6,6 +6,7 @@ import cn.yiiguxing.asclepius.widget.MaximizablePanel
 import vtk.extensions.jogl.VTKJoglCanvasImageViewer
 import vtk.rendering.vtkAbstractEventInterceptor
 import vtk.vtkAlgorithmOutput
+import vtk.vtkCornerAnnotation
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.event.MouseEvent
@@ -26,6 +27,8 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
     private val viewer = VTKJoglCanvasImageViewer()
     private val popupMenu = createPopupMenu()
 
+    private val annotation: vtkCornerAnnotation = vtkCornerAnnotation()
+
     var sliceOrientation
         get() = viewer.sliceOrientation
         set(value) {
@@ -40,8 +43,17 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
         get() = _isMaximize
 
     init {
+        annotation.apply {
+            SetText(1, "WL: ${viewer.colorLevel}\nWW: ${viewer.colorWindow}")
+
+            SetMaximumFontSize(15)
+            SetLinearFontScaleFactor(2.0)
+            SetNonlinearFontScaleFactor(1.0)
+            GetTextProperty().ShadowOn()
+        }
         viewer.apply {
             renderer.SetUseFXAA(true)
+            renderer.AddViewProp(annotation)
             interactorForwarder.eventInterceptor = EventInterceptor()
         }
 
@@ -116,6 +128,7 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
     }
 
     private fun setWindowLevel(windowWidth: Double, windowLevel: Double) {
+        annotation.SetText(1, "WL: $windowLevel\nWW: $windowWidth")
         with(viewer) {
             colorLevel = windowLevel
             colorWindow = if (isInverse) -windowWidth else windowWidth
