@@ -50,6 +50,14 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
         initMaximizeButton()
     }
 
+    private var lookupTablePreset: String? = null
+        set(value) {
+            if (value != field) {
+                field = value
+                viewer.lookupTable = value?.let { Presets.getLookUpTablePresets(it) }
+            }
+        }
+
     private var isInverse = false
         set(value) {
             if (value != field) {
@@ -132,33 +140,41 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
             }
         }
 
+        val itemMap = HashMap<String?, JRadioButtonMenuItem>()
         val pseudoColorGroup = ButtonGroup()
         val pseudoColorMenu = JMenu("Pseudo Color").apply {
             add(JRadioButtonMenuItem("OFF", true).apply {
+                itemMap[null] = this
                 pseudoColorGroup.add(this)
-                addActionListener { viewer.lookupTable = null }
+                addActionListener { lookupTablePreset = null }
             })
             addSeparator()
 
-            val lookUpTables = Presets.defaultLookUpTables.map { it.name to it.vtkLookupTable } +
-                    Presets.colorLookUpTables.map { it.name to it.vtkLookupTable }
-            lookUpTables.sortedBy { it.first }.forEach { (name, lookupTable) ->
+            Presets.lookUpTablePresets.keys.forEach { name ->
                 add(JRadioButtonMenuItem(name).apply {
+                    itemMap[name] = this
                     pseudoColorGroup.add(this)
-                    addActionListener { viewer.lookupTable = lookupTable }
+                    addActionListener { lookupTablePreset = name }
                 })
             }
+        }
+
+        val inverseItem = JCheckBoxMenuItem("Inverse").apply {
+            addActionListener { isInverse = isSelected }
         }
 
         add(windowLevelMenu)
         add(pseudoColorMenu)
         addSeparator()
-        add(JCheckBoxMenuItem("Inverse").apply { addActionListener { isInverse = isSelected } })
+        add(inverseItem)
 
         addPopupMenuListener(object : PopupMenuListener {
             override fun popupMenuWillBecomeInvisible(e: PopupMenuEvent) = Unit
             override fun popupMenuCanceled(e: PopupMenuEvent) = Unit
             override fun popupMenuWillBecomeVisible(e: PopupMenuEvent) {
+                inverseItem.isSelected = isInverse
+                itemMap[lookupTablePreset]?.model?.let { pseudoColorGroup.setSelected(it, true) }
+
                 val isEnabled = viewer.sliceRange != null
                 for (i in 0 until componentCount) {
                     getComponent(i).isEnabled = isEnabled

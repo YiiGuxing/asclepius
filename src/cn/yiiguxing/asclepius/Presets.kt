@@ -11,18 +11,19 @@ package cn.yiiguxing.asclepius
 import cn.yiiguxing.asclepius.util.readJson
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import vtk.vtkLookupTable
 import java.io.File
 
 
 object Presets {
 
-    private val clutList = mutableListOf<ColorLookUpTable>()
-    private val presetsList = mutableListOf<RayCastingPreset>()
-    private val lutList = mutableListOf<LookUpTablePreset>()
+    private val clutMap = LinkedHashMap<String, ColorLookUpTable>()
+    private val presetsMap = LinkedHashMap<String, RayCastingPreset>()
+    private val lutPresets = LinkedHashMap<String, vtkLookupTable>()
 
-    val colorLookUpTables: List<ColorLookUpTable> get() = clutList
-    val rayCastingPresets: List<RayCastingPreset> get() = presetsList
-    val defaultLookUpTables: List<LookUpTablePreset> get() = lutList
+    val colorLookUpTables: Map<String, ColorLookUpTable> get() = clutMap
+    val rayCastingPresets: Map<String, RayCastingPreset> get() = presetsMap
+    val lookUpTablePresets: Map<String, vtkLookupTable> get() = lutPresets
 
     val windowLevel: Map<String, WindowLevel> = mapOf(
             "Abdomen" to WindowLevel(400.0, 10.0),
@@ -35,11 +36,13 @@ object Presets {
             "Spine" to WindowLevel(300.0, 20.0)
     )
 
-    fun getColorLookUpTable(name: String) = clutList.find { name == it.name }
+    fun getColorLookUpTable(name: String) = clutMap[name]?.colorList
 
-    fun getDefaultLookUpTable(name: String) = lutList.find { name == it.name }
+    fun getLookUpTablePresets(name: String) = lutPresets[name]
 
-    fun getRayCastingPreset(name: String) = presetsList.find { name == it.name }
+    fun getRayCastingPreset(name: String) = presetsMap[name]
+
+    fun getWindowLevelPreset(name: String) = windowLevel[name]
 
     fun loadPresets() {
         val gson = Gson()
@@ -49,36 +52,29 @@ object Presets {
         val rayCastingPresetsDir = File(presetsDir, "ray-casting")
         val defaultLookupTablesFile = File(presetsDir, "default_lookup_tables.json")
 
-        defaultLookupTablesFile
+        val lookupTables = defaultLookupTablesFile
                 .readJson<List<LookUpTablePreset>>(gson, LookUpTablePresetList().type)
-                .sortedBy { it.name }
-                .let { presets ->
-                    lutList.apply {
-                        clear()
-                        addAll(presets)
-                    }
-                }
+                .map { it.name to it.vtkLookupTable }
+                .toMutableList()
 
+        val clutMap = clutMap.apply { clear() }
         colorsPresetsDir
                 .listFiles()
                 ?.map { it.readJson<ColorLookUpTableInner>(gson).asColorLookUpTable() }
-                ?.sortedBy { it.name }
-                ?.let { presets ->
-                    clutList.apply {
-                        clear()
-                        addAll(presets)
-                    }
+                ?.let {
+                    clutMap.apply { clear() } += it.sortedBy { it.name }.sortedBy { it.name }.map { it.name to it }
+                    lookupTables += it.map { it.name to it.vtkLookupTable }
                 }
+
+        lutPresets.apply { clear() } += lookupTables.sortedBy { it.first }
 
         rayCastingPresetsDir
                 .listFiles()
                 ?.map { it.readJson<RayCastingPreset>(gson) }
                 ?.sortedBy { it.name }
+                ?.map { it.name to it }
                 ?.let { presets ->
-                    presetsList.apply {
-                        clear()
-                        addAll(presets)
-                    }
+                    presetsMap.apply { clear() } += presets
                 }
     }
 }
@@ -126,7 +122,7 @@ data class RayCastingPreset(
 private val defaultColorList = (0..255).map { Color(it / 255.0, it / 255.0, it / 255.0) }
 
 val RayCastingPreset.colorLookUpTable: List<Color>
-    get() = clut?.let { Presets.getColorLookUpTable(it) }?.colorList ?: defaultColorList
+    get() = clut?.let { Presets.getColorLookUpTable(it) } ?: defaultColorList
 
 private data class ColorLookUpTableInner(
         val name: String,

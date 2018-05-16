@@ -94,8 +94,8 @@ class VolumeViewer : vtkJoglCanvasComponent() {
             })
             addSeparator()
 
-            Presets.rayCastingPresets.forEach { preset ->
-                add(JRadioButtonMenuItem(preset.name).apply {
+            Presets.rayCastingPresets.forEach { name, preset ->
+                add(JRadioButtonMenuItem(name).apply {
                     group.add(this)
                     addActionListener { currentPreset = preset }
                 })
