@@ -201,13 +201,18 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
     private inner class EventInterceptor : vtkAbstractEventInterceptor() {
         private var lastX: Int = 0
         private var lastY: Int = 0
-        private var adjustWWWC = false
+        private var isButton1Down = false
 
         override fun mousePressed(e: MouseEvent): Boolean {
             lastX = e.x
             lastY = e.y
-            adjustWWWC = e.button == MouseEvent.BUTTON1
+            isButton1Down = e.button == MouseEvent.BUTTON1
             return super.mousePressed(e)
+        }
+
+        override fun mouseReleased(e: MouseEvent?): Boolean {
+            isButton1Down = false
+            return super.mouseReleased(e)
         }
 
         override fun mouseClicked(e: MouseEvent): Boolean {
@@ -231,7 +236,7 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
         }
 
         override fun mouseDragged(e: MouseEvent): Boolean {
-            if (!adjustWWWC) {
+            if (!isButton1Down || e.isShiftDown || e.isControlDown) {
                 return super.mouseDragged(e)
             }
 

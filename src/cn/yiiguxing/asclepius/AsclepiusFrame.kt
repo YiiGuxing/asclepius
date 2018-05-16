@@ -52,6 +52,7 @@ class AsclepiusFrame : JFrame("Asclepius") {
         coronalViewer.setInputConnection(slice)
         sagittalViewer.setInputConnection(slice)
         volumeViewer.volumeViewer.imageData = reader.GetOutput()
+        reader.GetPatientName()
     }
 
     private fun createViewer(title: String,
