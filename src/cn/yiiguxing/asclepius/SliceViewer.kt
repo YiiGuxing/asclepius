@@ -29,6 +29,8 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
 
     private val annotation: vtkCornerAnnotation = vtkCornerAnnotation()
 
+    private var sliceCount: Int = 0
+
     var sliceOrientation
         get() = viewer.sliceOrientation
         set(value) {
@@ -59,7 +61,10 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
 
         titleLabel.text = title
         contentPanel.add(viewer.component, BorderLayout.CENTER)
-        scrollBar.addAdjustmentListener { viewer.slice = it.value }
+        scrollBar.addAdjustmentListener {
+            viewer.slice = it.value
+            updateSliceAnnotation()
+        }
 
         initMaximizeButton()
     }
@@ -115,6 +120,7 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
         val scrollBar = scrollBar
         val sliceRange = viewer.sliceRange
         if (sliceRange != null) {
+            sliceCount = sliceRange.last + 1
             val min = sliceRange.first
             val max = sliceRange.last
             val value = (min + max) / 2
@@ -123,7 +129,18 @@ class SliceViewer(title: String) : SliceViewerForm(), MaximizablePanel {
             scrollBar.blockIncrement = extent
             scrollBar.setValues(value, extent, min, max + extent)
         } else {
+            viewer.slice
+            sliceCount = 0
             scrollBar.setValues(0, 0, 0, 0)
+        }
+        updateSliceAnnotation()
+    }
+
+    private fun updateSliceAnnotation() {
+        if (sliceCount > 0) {
+            annotation.SetText(0, "${viewer.slice + 1}/$sliceCount")
+        } else {
+            annotation.SetText(0, null)
         }
     }
 
